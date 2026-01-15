@@ -5,6 +5,8 @@ import { PurchaseOrderService } from '../service/purchase-order-service';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToasterService } from '../../../../../services/toaster.service';
+import { PdfService } from '../../../../../services/pdf.service';
+import { Renderer2 } from '@angular/core';
 
 @Component({
   selector: 'app-purchase-order-list',
@@ -28,12 +30,15 @@ export class PurchaseOrderList implements OnInit {
   orderToDelete?: PurchaseOrderDto;
 
   openDropdownIndex: number | null = null;
+  dropdownTop: number = 0;
+  dropdownLeft: number = 0;
 
   constructor(
     private purchaseOrderService: PurchaseOrderService,
     private toaster: ToasterService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private pdfService: PdfService
+  ) { }
 
   ngOnInit() {
     this.loadPurchaseOrders();
@@ -85,12 +90,25 @@ export class PurchaseOrderList implements OnInit {
     this.router.navigate(['/purchase-orders/purchase-order-history', order.id]);
   }
 
-  toggleDropdown(index: number) {
-    this.openDropdownIndex = this.openDropdownIndex === index ? null : index;
+  toggleDropdown(index: number, event: Event) {
+    if (this.openDropdownIndex === index) {
+      this.openDropdownIndex = null;
+      return;
+    }
+    const button = event.target as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    this.dropdownTop = rect.bottom;
+    this.dropdownLeft = rect.right - 224; // w-56 is 14rem = 224px
+    this.openDropdownIndex = index;
   }
 
   closeDropdown() {
     this.openDropdownIndex = null;
+  }
+
+  printOrderPDF(order: PurchaseOrderDto) {
+    this.openDropdownIndex = null; // Close dropdown
+    this.pdfService.generatePurchaseOrderPDF(order);
   }
 
   get filteredOrders(): PurchaseOrderDto[] {

@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToasterService } from '../../../../../services/toaster.service';
+import { PdfService } from '../../../../../services/pdf.service';
 
 @Component({
   selector: 'app-list-sales-order',
@@ -31,6 +32,8 @@ export class ListSalesOrder implements OnInit {
   sortDirection: 'asc' | 'desc' = 'desc';
   dateFilter: string = '';
   openDropdownIndex: number | null = null;
+  dropdownTop: number = 0;
+  dropdownLeft: number = 0;
   showDeleteModal = false;
   orderToDelete?: SalesOrderDTO;
   constructor(
@@ -38,7 +41,8 @@ export class ListSalesOrder implements OnInit {
     private salesOrderService: SalesOrderService,
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
-    private toaster: ToasterService
+    private toaster: ToasterService,
+    private pdfService: PdfService
   ) {
     this.saleOrderForm = this.createForm();
   }
@@ -54,12 +58,25 @@ export class ListSalesOrder implements OnInit {
     this.openDropdownIndex = null; // Close dropdown
     this.router.navigate(['/sales-orders/sales-order-history', order.id]);
   }
-  toggleDropdown(index: number) {
-    this.openDropdownIndex = this.openDropdownIndex === index ? null : index;
+  toggleDropdown(index: number, event: Event) {
+    if (this.openDropdownIndex === index) {
+      this.openDropdownIndex = null;
+      return;
+    }
+    const button = event.target as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    this.dropdownTop = rect.bottom;
+    this.dropdownLeft = rect.right - 224; // w-56 is 14rem = 224px
+    this.openDropdownIndex = index;
   }
 
   closeDropdown() {
     this.openDropdownIndex = null;
+  }
+
+  printOrderPDF(order: SalesOrderDTO) {
+    this.openDropdownIndex = null; // Close dropdown
+    this.pdfService.generateSalesOrderPDF(order);
   }
   deleteSalesOrder(order: SalesOrderDTO) {
     this.openDropdownIndex = null; // Close dropdown

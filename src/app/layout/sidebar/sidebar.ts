@@ -96,13 +96,14 @@ export class Sidebar implements OnInit, OnDestroy {
     private authService: AuthService,
     private purchaseOrderService: PurchaseOrderService,
     private salesOrderService: SalesOrderService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Subscribe to current user changes
     this.userSubscription = this.authService.currentUser$.subscribe((user) => {
       if (user) {
         this.currentUserRole = user?.role || '';
+        console.log('User role from subscription:', this.currentUserRole);
         this.filterMenuItemsByRole();
       } else {
         // If no user, show empty menu or default items
@@ -114,6 +115,7 @@ export class Sidebar implements OnInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.currentUserRole = currentUser?.role || '';
+      console.log('User role on initial load:', this.currentUserRole);
       this.filterMenuItemsByRole();
     }
 
