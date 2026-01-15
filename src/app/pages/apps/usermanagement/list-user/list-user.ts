@@ -30,12 +30,14 @@ export class ListUser implements OnInit {
   isDeleting = false;
 
   openDropdownIndex: number | null = null;
+  dropdownTop: number = 0;
+  dropdownLeft: number = 0;
 
   constructor(
     private toaster: ToasterService,
     private router: Router,
     private userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadUsers();
@@ -178,8 +180,16 @@ export class ListUser implements OnInit {
     return new Date(dateString).toLocaleDateString();
   }
 
-  toggleDropdown(index: number) {
-    this.openDropdownIndex = this.openDropdownIndex === index ? null : index;
+  toggleDropdown(index: number, event: Event) {
+    if (this.openDropdownIndex === index) {
+      this.openDropdownIndex = null;
+      return;
+    }
+    const button = event.target as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    this.dropdownTop = rect.bottom;
+    this.dropdownLeft = rect.right - 224; // w-56 is 14rem = 224px
+    this.openDropdownIndex = index;
   }
 
   viewUserDetails(user: UserDTO) {
