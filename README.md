@@ -1,59 +1,130 @@
-# FinExpWebUiService
+# Inventory Management Information System (InventoryMIS) Web Service
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
+A modern Angular-based web application providing comprehensive inventory management capabilities including product types, purchase orders, sales orders, user management, and dashboard reporting.
 
-## Development server
+## Tech Stack
 
-To start a local development server, run:
+- **Framework:** Angular 20.3
+- **Language:** TypeScript 5.9
+- **UI:** Tailwind CSS 4.1
+- **State Management:** RxJS 7.8
+- **HTTP Client:** Angular HttpClient with Fetch API
+- **PDF Generation:** jsPDF, jspdf-autotable, pdfmake
+- **Testing:** Jasmine + Karma
+
+## Key Features
+
+- Role-based access control (RBAC)
+- JWT authentication with refresh token support
+- Dashboard with statistical overview
+- Product type management
+- Purchase order lifecycle management
+- Sales order lifecycle management
+- User management
+- PDF report generation
+- Toast notifications
+- Responsive sidebar navigation
+
+## User Roles
+
+| Role | Dashboard | Product Types | Purchase Orders | Sales Orders | User Management |
+|------|-----------|---------------|-----------------|--------------|-----------------|
+| ADMIN | Yes | Yes | Yes | Yes | Yes |
+| MANAGER | Yes | Yes | Yes | Yes | No |
+| STOCK_OFFICER | Yes | Yes | Yes | No | No |
+| SALES_OFFICER | Yes | No | No | Yes | No |
+
+## Development
+
+First, install dependencies:
 
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Development Server
 
-## Code scaffolding
+```bash
+npm start
+```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Open http://localhost:4200. The application auto-reloads on file changes.
+
+### Build
+
+```bash
+npm run build
+```
+
+Build artifacts will be stored in the `dist/` directory.
+
+### Code Scaffolding
 
 ```bash
 ng generate component component-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Testing
 
 ```bash
-ng generate --help
+npm test
 ```
 
-## Building
+## Project Structure
 
-To build the project run:
-
-```bash
-ng build
+```
+src/app/
+  app.config.ts            # App configuration (routing, HTTP, interceptors)
+  app.routes.ts            # Route definitions with lazy loading
+  app.ts                   # Root component
+  environment/
+    environment.ts         # Local/UAT API config
+    environment-prod.ts    # Production API config
+  common/dto/
+    inventory/             # DTOs for product types, purchase/sales orders
+    usermanagement/        # User and Role DTOs
+    report/                # Dashboard and report DTOs
+    util/                  # Base DTOs, response wrappers, deserializers
+  elements/toast/          # Toast notification component
+  components/
+    toaster.component.ts   # Toaster wrapper
+  services/
+    pdf.service.ts         # PDF generation logic
+    toaster.service.ts     # Toast notification service
+  layout/                  # Main, Auth, Sidebar, Header, Footer layouts
+  pages/apps/
+    dashboard/             # Dashboard page and service
+    inventory/
+      product-type/        # Product type management
+      purchase-orders/     # Purchase order CRUD + history
+      salesOrder/          # Sales order CRUD + history
+    security/              # Login, auth guard, HTTP interceptor
+    usermanagement/        # User and role management
+  public/                  # Static assets
+  styles.css               # Global styles
+  main.ts                  # Bootstrap file
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Architecture
 
-## Running unit tests
+- **Lazy Loading:** All routes use `loadComponent` for code splitting
+- **Service Layer:** Each module has dedicated services for API communication
+- **DTOs:** Shared data transfer objects in `common/dto/` with generic deserialization
+- **HTTP Interceptor:** Attaches JWT tokens and handles 401/403 errors
+- **Auth Guard:** Protects private routes
+- **Standalone Components:** All components use Angular 20 standalone pattern
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## API Configuration
 
-```bash
-ng test
-```
+Environments are defined under `src/app/environment/`:
 
-## Running end-to-end tests
+- **Development (local):** `http://207.180.213.111:8081/api/v1`
+- **Production:** `http://157.173.97.196:8082/api/v1`
 
-For end-to-end (e2e) testing, run:
+Token whitelist (public endpoints are automatically excluded from interceptor):
+- `/security/auth/login`
+- `/security/auth/register`
 
-```bash
-ng e2e
-```
+## License
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Private - All rights reserved
